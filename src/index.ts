@@ -99,15 +99,7 @@ class Rectangle extends Square {
     }
 }
 const shape:Shape = new Square(3, 4, 10); //Upper casting
-//way of specific methods call
-// if (shape instanceof Square) {
-//     console.log(shape.width); 
-// }
-/****************demo of setter usage with checking and following exception */
-// const point: Point = new Point(10, 10);
-// point.draw();
-// point.x = 200;
-// point.draw();
+
 const shapes: Shape[] = [
     new Line(3, 4, new Point(10, 10)),
     new Square(2, 5, 10),
@@ -119,27 +111,48 @@ shapes.forEach(shape => shape.draw());
 class Canvas implements Shape {
     private _shapes: Shape[] = []
     draw(): void {
-        //TODO write method draw for drawing all shapes in the canvas
+        this._shapes.forEach(s => s.draw());
     }
     addShape(shape: Shape): number {
-        //TODO write method adding the given shape inside _shapes
+        // method adding the given shape inside _shapes
         //returns an index of added shape 
-        return 0;
+        return this._shapes.push(shape) - 1;
     }
     removeShape(index: number): Shape {
         //TODO write method removing a shape at the given index
         //returns reference to the removed shape
-        return this._shapes[0];
+        return this._shapes.splice(index, 1)[0];
     }
     sort(): void {
         //TODO write method sorting the shapes in the following order
         //ascending order of the property x
         //in the case of equaled x values - descending order of the property y
+        this._shapes.sort((a,b) => a instanceof Point && b instanceof Point ? 
+        b.x - a.x || a.y - b.y : 0 )
     }
     removeIf(predicate: (shape: Shape)=>boolean) {
-        //TODO write method removing all the shapes matchin the given predicate function
-        //TODO write function for testing the method removeIf with the following predicate:
+        //removing all the shapes matching the given predicate function
+        // function for testing the method removeIf with the following predicate:
         //remove all lines having the property x of second point greater than the property x of the first point
+        this._shapes =  this._shapes.filter(s => !predicate(s))
     }
     
 }
+const canvas = new Canvas();
+canvas.addShape(new Line(3, 4, new Point(2,4)));
+canvas.addShape(new Line(3, 4, new Point(4,3)));
+canvas.addShape(new Rectangle(10, 2, 50, 20));
+canvas.addShape(new Square(5,50,30));
+canvas.addShape(new Square(5,5,30));
+canvas.addShape(new Square(5,5,30));
+canvas.addShape(new Line(3,4,new Point(4,3)));
+console.log (`removed shape is ${JSON.stringify(canvas.removeShape(5))}`)
+canvas.sort();
+console.log('+++++++++++++++++++++++++draw before reomoving+++++++++++++++++++++++');
+canvas.draw();
+console.log('+++++++++++++++++++++++++draw after reomoving+++++++++++++++++++++++');
+canvas.removeIf(s => s instanceof Line && s.point.x > s.x);
+canvas.draw();
+
+
+
